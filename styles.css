@@ -58,14 +58,13 @@ body[data-theme="dark"] {
 }
 
 .app-shell {
-  width: min(1120px, 100%);
+  width: min(1460px, 100%);
   margin: 0 auto;
   padding: 32px 16px;
 }
 
 .calculator {
   position: relative;
-  overflow: hidden;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -79,6 +78,7 @@ body[data-theme="dark"] {
   inset: 0 0 auto;
   height: 7px;
   background: linear-gradient(90deg, var(--accent), var(--gold), var(--rose));
+  border-radius: 8px 8px 0 0;
 }
 
 body[data-theme="dark"] .calculator {
@@ -251,7 +251,7 @@ body[data-theme="dark"] .subject-count input:checked + span {
 
 .subject-row {
   display: grid;
-  grid-template-columns: minmax(210px, 1.15fr) 150px minmax(460px, 1.8fr) 120px;
+  grid-template-columns: minmax(220px, 1.15fr) 140px 136px minmax(400px, 1.7fr) 130px;
   align-items: end;
   gap: 14px;
   position: relative;
@@ -262,6 +262,16 @@ body[data-theme="dark"] .subject-count input:checked + span {
     linear-gradient(90deg, rgba(23, 107, 135, 0.045), transparent 36%),
     rgba(251, 252, 253, 0.92);
   box-shadow: 0 8px 22px rgba(24, 32, 42, 0.04);
+}
+
+@media (max-width: 1180px) {
+  .subject-row {
+    grid-template-columns: minmax(220px, 1fr) 140px 136px 130px;
+  }
+
+  .learning-goals {
+    grid-column: 1 / -1;
+  }
 }
 
 .subject-row:nth-child(even) {
@@ -408,9 +418,46 @@ select:focus {
 }
 
 .goal-field label,
-.subject-result span {
+.subject-result span,
+.quick-fill span {
   color: var(--muted);
   font-size: 0.82rem;
+}
+
+.quick-fill {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.quick-fill-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.quick-fill button {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent-strong);
+  background: linear-gradient(180deg, #fff, #f8fafc);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.quick-fill button:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 18px rgba(23, 107, 135, 0.11);
+  transform: translateY(-1px);
+}
+
+body[data-theme="dark"] .quick-fill button {
+  color: var(--accent-strong);
+  border-color: #40566a;
+  background: linear-gradient(180deg, #223240, #1b2936);
 }
 
 .subject-result {
@@ -434,6 +481,16 @@ select:focus {
 body[data-theme="dark"] .subject-points {
   background: linear-gradient(180deg, #1d4937, #183b2f);
   color: #a6f0c2;
+}
+
+.incomplete-subject .subject-points {
+  background: linear-gradient(180deg, #f6f0e5, #efe5d4);
+  color: var(--gold);
+}
+
+body[data-theme="dark"] .incomplete-subject .subject-points {
+  background: linear-gradient(180deg, #3b321f, #30291c);
+  color: var(--gold);
 }
 
 .subject-points {
@@ -520,8 +577,12 @@ body[data-theme="dark"] .site-footer {
 }
 
 @media (max-width: 760px) {
+  body {
+    overflow-x: hidden;
+  }
+
   .calculator {
-    padding: 18px;
+    padding: 20px 14px 16px;
   }
 
   .header,
@@ -532,17 +593,56 @@ body[data-theme="dark"] .site-footer {
 
   .header-actions {
     width: 100%;
+    align-items: stretch;
   }
 
   .total-badge {
     flex: 1;
   }
 
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  .subject-count {
+    gap: 8px;
+  }
+
+  .subject-count span {
+    justify-content: center;
+    width: 100%;
+  }
+
   .subject-row,
+  .quick-fill,
   .learning-goals,
   .subject-result,
   .summary {
     grid-template-columns: 1fr;
+  }
+
+  .subject-row {
+    gap: 12px;
+    padding: 22px 14px 14px;
+  }
+
+  .subject-row::before {
+    inset-inline-start: 14px;
+  }
+
+  .learning-goals {
+    gap: 10px;
+  }
+
+  .quick-fill-buttons {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  input,
+  select,
+  .quick-fill button,
+  .subject-points {
+    min-height: 46px;
   }
 
   .subject-points {
@@ -555,5 +655,54 @@ body[data-theme="dark"] .site-footer {
   .subject-result span {
     grid-column: auto;
     grid-row: auto;
+  }
+
+  .summary {
+    gap: 10px;
+  }
+
+  .summary div {
+    padding: 16px;
+  }
+
+  .summary strong {
+    font-size: 1.55rem;
+  }
+
+  .site-footer {
+    width: 100%;
+    border-radius: 8px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 430px) {
+  .app-shell {
+    padding: 12px 8px;
+  }
+
+  .calculator {
+    padding-inline: 12px;
+  }
+
+  .header-actions {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+  }
+
+  .fixed-value {
+    min-height: auto;
+  }
+
+  .goal-field label,
+  .subject-result span,
+  .quick-fill span,
+  .field label {
+    font-size: 0.78rem;
+  }
+
+  select {
+    padding-inline: 9px;
+    font-size: 0.95rem;
   }
 }

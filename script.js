@@ -1,7 +1,7 @@
 const gradeValues = {
-  D: 35,
-  M: 25,
-  P: 15,
+  D: 100,
+  M: 80,
+  P: 60,
 };
 
 const goalLabels = ["أ", "ب", "ج", "د"];
@@ -84,6 +84,7 @@ function createGoalSelectors(row, goalsCount) {
     label.textContent = `هدف ${goalLabels[index]}`;
     select.name = "learning-goal-grade";
     select.innerHTML = `
+      <option value="">اختر العلامة</option>
       <option value="D">D - امتياز</option>
       <option value="M">M - جيد</option>
       <option value="P">P - نجاح</option>
@@ -104,22 +105,29 @@ function updateResults() {
     return sum + Number(row.querySelector('select[name="subject-hours"]').value);
   }, 0);
 
-  let weightedTotal = 0;
+  let weightedPercent = 0;
 
   rows.forEach((row) => {
     const hours = Number(row.querySelector('select[name="subject-hours"]').value);
     const goals = [...row.querySelectorAll('select[name="learning-goal-grade"]')];
-    const gradeSum = goals.reduce((sum, goal) => sum + gradeValues[goal.value], 0);
-    const subjectAverage = goals.length ? gradeSum / goals.length : 0;
-    const subjectPoints = totalHours ? (subjectAverage * hours) / totalHours : 0;
+    const selectedGoals = goals.filter((goal) => goal.value);
+    const gradeSum = selectedGoals.reduce((sum, goal) => sum + gradeValues[goal.value], 0);
+    const isSubjectComplete = selectedGoals.length === goals.length;
+    const subjectPercent = goals.length ? gradeSum / goals.length : 0;
+    const subjectPoints = totalHours && isSubjectComplete ? ((subjectPercent * 35) / 100) * (hours / totalHours) : 0;
+    const subjectWeightedPercent = totalHours && isSubjectComplete ? subjectPercent * (hours / totalHours) : 0;
 
-    weightedTotal += subjectPoints;
-    row.querySelector(".subject-points").value = subjectPoints.toFixed(2);
+    weightedPercent += subjectWeightedPercent;
+    row.classList.toggle("incomplete-subject", !isSubjectComplete);
+    row.querySelector(".subject-points").value = isSubjectComplete ? subjectPoints.toFixed(2) : "--";
   });
 
+  const averageOutOf35 = (weightedPercent * 35) / 100;
+  const isFormComplete = rows.every((row) => !row.classList.contains("incomplete-subject"));
+
   totalHoursElement.textContent = totalHours;
-  averageScoreElement.textContent = weightedTotal.toFixed(2);
-  totalScoreElement.textContent = `${weightedTotal.toFixed(2)} / 35`;
+  averageScoreElement.textContent = isFormComplete ? averageOutOf35.toFixed(2) : "--";
+  totalScoreElement.textContent = isFormComplete ? `${averageOutOf35.toFixed(2)} / 35` : "غير مكتمل";
 }
 
 countInputs.forEach((input) => {
@@ -133,6 +141,22 @@ themeToggle.addEventListener("click", () => {
 
 subjectsList.addEventListener("input", updateResults);
 subjectsList.addEventListener("change", updateResults);
+subjectsList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-fill-grade]");
+
+  if (!button) {
+    return;
+  }
+
+  const row = button.closest(".subject-row");
+  const grade = button.dataset.fillGrade;
+
+  row.querySelectorAll('select[name="learning-goal-grade"]').forEach((select) => {
+    select.value = grade;
+  });
+
+  updateResults();
+});
 
 function setTheme(theme) {
   document.body.dataset.theme = theme;
