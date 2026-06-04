@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تعليمات حساب العلامات</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="floating-home-link" href="index.html">الصفحة الرئيسية</a>
+    <main class="app-shell home-shell">
+      <section class="calculator info-panel" aria-labelledby="instructions-title">
+        <p class="eyebrow">تعليمات</p>
+        <h1 id="instructions-title">تعليمات حساب العلامات</h1>
+
+        <div class="info-list">
+          <article>
+            <h2>اختيار الصف أو المسار</h2>
+            <p>من صفحة حاسبة IT اختر الصف المطلوب: عاشر، اول ثانوي، أو ثاني ثانوي. تظهر المواد والساعات تلقائيا.</p>
+          </article>
+          <article>
+            <h2>اختيار علامات الأهداف</h2>
+            <p>لكل مادة أهداف تعلم. اختر علامة كل هدف من القائمة: D أو M أو P. يمكن استخدام أزرار التعبئة السريعة لتطبيق نفس العلامة على كل أهداف المادة.</p>
+          </article>
+          <article>
+            <h2>طريقة الحساب</h2>
+            <p>يعتمد النظام القيم التالية: D = 100، M = 80، P = 60. بعدها يحسب متوسط أهداف المادة، ثم يوزنه حسب عدد ساعات المادة، ثم يحول النتيجة إلى معدل من 35.</p>
+          </article>
+          <article>
+            <h2>اكتمال الحساب</h2>
+            <p>إذا بقي أي هدف بدون اختيار، يظهر المجموع كغير مكتمل. بعد اختيار كل الأهداف يظهر المعدل النهائي مباشرة.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <strong>ابراهيم الصعيدي</strong>
+        <span>Ibrahim Al Saidi</span>
+      </footer>
+    </main>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("grades-theme") || "dark";
+    </script>
+  </body>
+</html>

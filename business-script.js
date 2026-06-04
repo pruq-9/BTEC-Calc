@@ -4,70 +4,71 @@ const gradeValues = {
   P: 60,
 };
 
-const goalLabels = ["أ", "ب", "ج", "د"];
-const firstSecondarySubjects = [
-  { name: "أنظمة تكنولوجيا المعلومات", hours: 120 },
-  { name: "تطوير المواقع الالكترونية", hours: 60 },
-  { name: "تطوير تطبيقات الهاتف المحمول", hours: 60 },
-  { name: "تطوير العاب الحاسوب", hours: 60 },
-  { name: "الدعم الفني وادارة تكنولوجيا المعلومات", hours: 60 },
+const goalLabels = ["أ", "ب", "ج", "د", "ه"];
+const tenthGradeBusinessSubjects = [
+  { name: "الغرض من الشركة", hours: 30 },
+  { name: "مؤسسات التجارية", hours: 30 },
+  { name: "التنبؤ بالأداء المالي للشركة", hours: 30 },
+  { name: "خطة التسويق", hours: 30 },
+  { name: "انشاء شركة صغيرة", hours: 60 },
+  { name: "العمل ضمن فريق", hours: 30 },
+  { name: "إدارة الشؤون المالية الشخصية", hours: 30 },
+  { name: "تقنيات العرض و الترويج", hours: 30 },
+  { name: "الأشخاص في الشركات", hours: 30 },
+  { name: "الأعمال عبر الإنترنت", hours: 60 },
+  { name: "اخلاقيات العمل", hours: 30 },
+  { name: "إدارة شركة صغيرة", hours: 30 },
 ];
-const secondSecondarySubjects = [
-  { name: "الامن السيبراني وادارة الحوادث", hours: 120 },
-  { name: "مقدمة في الذكاء الاصطناعي", hours: 90 },
-  { name: "البرمجة", hours: 90 },
-  { name: "ادارة مشاريع تكنولوجيا المعلومات", hours: 60 },
+const firstSecondaryBusinessSubjects = [
+  { name: "استكشاف الأعمال", hours: 90 },
+  { name: "البحث والتخطيط لحملة تسويقية", hours: 90 },
+  { name: "تمويل الأعمال", hours: 90 },
+  { name: "إدارة إحدى الفعاليات", hours: 90 },
 ];
-const tenthGradeSubjects = [
-  { name: "استخدام تكنولوجيا المعلومات في المؤسسات", hours: 60 },
-  { name: "نمذجة البيانات وجداول البيانات", hours: 60 },
-  { name: "مقدمة للرسومات الرقمية والرسوم المتحركة", hours: 60 },
-  { name: "مقدمة في البرمجة", hours: 60 },
-  { name: "مقدمة في شبكات الحاسوب", hours: 60 },
-  { name: "مقدمة في تصميم الالعاب", hours: 60 },
-  { name: "مقدمة في تصميم مواقع الويب", hours: 60 },
-  { name: "مقدمة في التطبيقات", hours: 60 },
+const secondSecondaryBusinessSubjects = [
+  { name: "مبادئ الإدارة", hours: 60 },
+  { name: "اتخاذ قرارات الأعمال", hours: 120 },
+  { name: "الموارد البشرية", hours: 60 },
+  { name: "دراسة خدمة العملاء", hours: 60 },
+  { name: "اخلاقيات الأعمال", hours: 60 },
 ];
-const subjectsByGrade = {
-  10: tenthGradeSubjects,
-  11: firstSecondarySubjects,
-  12: secondSecondarySubjects,
+const businessSubjectsByGrade = {
+  10: tenthGradeBusinessSubjects,
+  11: firstSecondaryBusinessSubjects,
+  12: secondSecondaryBusinessSubjects,
 };
+
 const subjectsList = document.querySelector("#subjects-list");
 const subjectTemplate = document.querySelector("#subject-template");
 const totalHoursElement = document.querySelector("#total-hours");
 const averageScoreElement = document.querySelector("#average-score");
 const totalScoreElement = document.querySelector("#total-score");
-const countInputs = document.querySelectorAll('input[name="subject-count"]');
-const themeToggle = document.querySelector("#theme-toggle");
 const resetGradesButton = document.querySelector("#reset-grades");
+const gradeInputs = document.querySelectorAll('input[name="subject-count"]');
 
 function createSubjectRows(grade) {
   subjectsList.innerHTML = "";
-  const subjects = subjectsByGrade[grade];
+  const subjects = businessSubjectsByGrade[grade];
 
-  for (let index = 0; index < subjects.length; index += 1) {
+  subjects.forEach((subject, index) => {
     const row = subjectTemplate.content.firstElementChild.cloneNode(true);
     const nameInput = row.querySelector('input[name="subject-name"]');
     const hoursSelect = row.querySelector('select[name="subject-hours"]');
-    const goalsCount = grade === 12 && index === subjects.length - 1 ? 4 : 3;
-    const fixedSubject = subjects[index];
 
-    nameInput.placeholder = `المادة ${index + 1}`;
-    nameInput.value = fixedSubject?.name || "";
-    nameInput.readOnly = Boolean(fixedSubject);
-    hoursSelect.value = fixedSubject?.hours || 60;
-    hoursSelect.disabled = Boolean(fixedSubject);
+    nameInput.value = subject.name;
+    nameInput.readOnly = true;
+    hoursSelect.value = subject.hours;
+    hoursSelect.disabled = true;
     row.dataset.subjectNumber = index + 1;
-    row.classList.toggle("fixed-subject", Boolean(fixedSubject));
-    if (fixedSubject) {
-      showFixedSubjectText(row, fixedSubject);
-    }
+    row.classList.add("fixed-subject");
+    const goalsCount =
+      grade === 11 && index === subjects.length - 1 ? 5 : grade === 12 && index === 1 ? 4 : 3;
     row.style.setProperty("--goal-count", goalsCount);
-    row.classList.toggle("extra-goals-subject", goalsCount === 4);
+
+    showFixedSubjectText(row, subject);
     createGoalSelectors(row, goalsCount);
     subjectsList.append(row);
-  }
+  });
 
   updateResults();
 }
@@ -91,13 +92,13 @@ function createGoalSelectors(row, goalsCount) {
   const goalsContainer = row.querySelector("[data-learning-goals]");
   goalsContainer.innerHTML = "";
 
-  for (let index = 0; index < goalsCount; index += 1) {
+  goalLabels.slice(0, goalsCount).forEach((goalLabel) => {
     const field = document.createElement("div");
     const label = document.createElement("label");
     const select = document.createElement("select");
 
     field.className = "goal-field";
-    label.textContent = `هدف ${goalLabels[index]}`;
+    label.textContent = `هدف ${goalLabel}`;
     select.name = "learning-goal-grade";
     select.innerHTML = `
       <option value="">اختر العلامة</option>
@@ -108,11 +109,7 @@ function createGoalSelectors(row, goalsCount) {
 
     field.append(label, select);
     goalsContainer.append(field);
-  }
-}
-
-function getSelectedGrade() {
-  return Number(document.querySelector('input[name="subject-count"]:checked').value);
+  });
 }
 
 function updateResults() {
@@ -146,23 +143,16 @@ function updateResults() {
   totalScoreElement.textContent = isFormComplete ? `${averageOutOf35.toFixed(2)} / 35` : "غير مكتمل";
 }
 
-countInputs.forEach((input) => {
-  input.addEventListener("change", () => createSubjectRows(getSelectedGrade()));
-});
-
-if (themeToggle) {
-  themeToggle.addEventListener("click", () => {
-    const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-  });
-}
-
 resetGradesButton.addEventListener("click", () => {
   subjectsList.querySelectorAll('select[name="learning-goal-grade"]').forEach((select) => {
     select.value = "";
   });
 
   updateResults();
+});
+
+gradeInputs.forEach((input) => {
+  input.addEventListener("change", () => createSubjectRows(getSelectedGrade()));
 });
 
 subjectsList.addEventListener("input", updateResults);
@@ -184,10 +174,10 @@ subjectsList.addEventListener("click", (event) => {
   updateResults();
 });
 
-function setTheme(theme) {
-  document.body.dataset.theme = theme;
-  localStorage.setItem("grades-theme", theme);
+document.body.dataset.theme = localStorage.getItem("grades-theme") || "dark";
+
+function getSelectedGrade() {
+  return Number(document.querySelector('input[name="subject-count"]:checked').value);
 }
 
-setTheme(localStorage.getItem("grades-theme") || "dark");
 createSubjectRows(getSelectedGrade());

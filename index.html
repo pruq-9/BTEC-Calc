@@ -7,51 +7,40 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <section class="calculator" aria-labelledby="page-title">
-        <div class="header">
-          <div>
-            <p class="eyebrow">حاسبة المعدل</p>
-            <h1 id="page-title">نظام حساب علامات BTEC L3 IT</h1>
-          </div>
-          <div class="header-actions">
-            <button class="theme-toggle" type="button" id="theme-toggle" aria-label="تبديل الوضع الليلي">
-              <span class="sun-icon" aria-hidden="true">☀</span>
-              <span class="moon-icon" aria-hidden="true">☾</span>
-            </button>
-            <div class="total-badge">
-              <span>المجموع</span>
-              <strong id="total-score">0 / 35</strong>
-            </div>
-          </div>
+    <main class="app-shell home-shell">
+      <section class="calculator home-panel" aria-labelledby="home-title">
+        <div class="home-topbar">
+          <strong>GradeCalc</strong>
+          <button class="theme-toggle home-theme-toggle" type="button" id="theme-toggle" aria-label="تبديل الوضع الليلي">
+            <span class="theme-label">Theme</span>
+            <span class="sun-icon" aria-hidden="true">☀</span>
+            <span class="moon-icon" aria-hidden="true">☾</span>
+          </button>
         </div>
 
-        <form id="grades-form">
-          <fieldset class="subject-count">
-            <legend>عدد المواد</legend>
-            <label>
-              <input type="radio" name="subject-count" value="4" checked />
-              <span>ثاني ثانوي</span>
-            </label>
-            <label>
-              <input type="radio" name="subject-count" value="5" />
-              <span>اول ثانوي</span>
-            </label>
-          </fieldset>
+        <div class="home-hero">
+          <p class="eyebrow">BTEC Grade Calculator</p>
+          <h1 id="home-title">نظام حساب العلامات</h1>
+          <p class="home-copy">اختر الحاسبة المناسبة لمسارك، أو افتح التعليمات لمعرفة طريقة احتساب علامات D و M و P.</p>
+        </div>
 
-          <div id="subjects-list" class="subjects-list"></div>
-        </form>
-
-        <section class="summary" aria-live="polite">
-          <div>
-            <span>إجمالي الساعات</span>
-            <strong id="total-hours">0</strong>
-          </div>
-          <div>
-            <span>المعدل من 35</span>
-            <strong id="average-score">0.00</strong>
-          </div>
-        </section>
+        <nav class="home-grid" aria-label="خيارات النظام">
+          <a class="home-card" href="it.html">
+            <span>01</span>
+            <strong>تكنولوجيا المعلومات</strong>
+            <small>حساب معدل  BTEC IT</small>
+          </a>
+          <a class="home-card" href="business.html">
+            <span>02</span>
+            <strong>إدارة أعمال</strong>
+            <small>حساب معدل BTEC Business Management</small>
+          </a>
+          <a class="home-card instructions-card" href="instructions.html">
+            <span>03</span>
+            <strong>تعليمات حساب العلامات</strong>
+            <small>طريقة استخدام النظام ومعنى D / M / P</small>
+          </a>
+        </nav>
       </section>
 
       <footer class="site-footer">
@@ -59,37 +48,20 @@
         <span>Ibrahim Al Saidi</span>
       </footer>
     </main>
+    <script>
+      const themeToggle = document.querySelector("#theme-toggle");
 
-    <template id="subject-template">
-      <article class="subject-row">
-        <div class="field subject-name">
-          <label>اسم المادة</label>
-          <input type="text" name="subject-name" placeholder="مثال: الرياضيات" />
-        </div>
-        <div class="field">
-          <label>عدد الساعات</label>
-          <select name="subject-hours">
-            <option value="60">60 ساعة</option>
-            <option value="90">90 ساعة</option>
-            <option value="120">120 ساعة</option>
-          </select>
-        </div>
-        <div class="quick-fill" aria-label="اختيار علامة لجميع أهداف المادة">
-          <span>تعبئة سريعة</span>
-          <div class="quick-fill-buttons">
-            <button type="button" data-fill-grade="D">D</button>
-            <button type="button" data-fill-grade="M">M</button>
-            <button type="button" data-fill-grade="P">P</button>
-          </div>
-        </div>
-        <div class="learning-goals" data-learning-goals></div>
-        <div class="subject-result">
-          <span>النقاط الموزونة</span>
-          <output class="subject-points" name="subject-points">0.00</output>
-        </div>
-      </article>
-    </template>
+      function setTheme(theme) {
+        document.body.dataset.theme = theme;
+        localStorage.setItem("grades-theme", theme);
+      }
 
-    <script src="script.js"></script>
+      themeToggle.addEventListener("click", () => {
+        const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
+        setTheme(nextTheme);
+      });
+
+      setTheme(localStorage.getItem("grades-theme") || "dark");
+    </script>
   </body>
 </html>
