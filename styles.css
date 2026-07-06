@@ -216,6 +216,10 @@ form {
   border: 0;
 }
 
+.score-scale[hidden] {
+  display: none;
+}
+
 .subject-count legend {
   margin-bottom: 10px;
   font-weight: 700;
@@ -784,18 +788,35 @@ body[data-theme="dark"] .home-card span {
   top: 16px;
   inset-inline-start: 16px;
   z-index: 20;
-  min-height: 42px;
+  width: 48px;
+  height: 48px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 0 14px;
   color: var(--accent-strong);
   background: rgba(255, 255, 255, 0.88);
   box-shadow: 0 10px 26px rgba(24, 32, 42, 0.12);
-  font-weight: 700;
   text-decoration: none;
   backdrop-filter: blur(10px);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floating-home-link:hover {
+  border-color: var(--accent);
+  box-shadow: 0 14px 30px rgba(24, 32, 42, 0.16);
+  transform: translateY(-1px);
+}
+
+.floating-home-link svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 body[data-theme="dark"] .floating-home-link {
@@ -841,9 +862,8 @@ body[data-theme="dark"] .info-list article {
   .floating-home-link {
     top: 10px;
     inset-inline-start: 10px;
-    min-height: 38px;
-    padding: 0 12px;
-    font-size: 0.85rem;
+    width: 42px;
+    height: 42px;
   }
 
   .floating-home-link + .app-shell {

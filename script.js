@@ -37,8 +37,12 @@ const subjectsList = document.querySelector("#subjects-list");
 const subjectTemplate = document.querySelector("#subject-template");
 const totalHoursElement = document.querySelector("#total-hours");
 const averageScoreElement = document.querySelector("#average-score");
+const averageScoreLabel = document.querySelector("#average-score-label");
 const totalScoreElement = document.querySelector("#total-score");
+const totalScoreLabel = document.querySelector("#total-score-label");
 const countInputs = document.querySelectorAll('input[name="subject-count"]');
+const scaleFieldset = document.querySelector("#tenth-grade-scale");
+const scaleInputs = document.querySelectorAll('input[name="score-scale"]');
 const themeToggle = document.querySelector("#theme-toggle");
 const resetGradesButton = document.querySelector("#reset-grades");
 
@@ -115,11 +119,29 @@ function getSelectedGrade() {
   return Number(document.querySelector('input[name="subject-count"]:checked').value);
 }
 
+function getScoreScale() {
+  if (getSelectedGrade() !== 10) {
+    return 35;
+  }
+
+  return Number(document.querySelector('input[name="score-scale"]:checked')?.value || 70);
+}
+
+function updateScaleControls() {
+  const scoreScale = getScoreScale();
+
+  scaleFieldset.hidden = getSelectedGrade() !== 10;
+  averageScoreLabel.textContent = `المعدل من ${scoreScale}`;
+  totalScoreLabel.textContent = `المجموع من ${scoreScale}`;
+}
+
 function updateResults() {
+  updateScaleControls();
   const rows = [...subjectsList.querySelectorAll(".subject-row")];
   const totalHours = rows.reduce((sum, row) => {
     return sum + Number(row.querySelector('select[name="subject-hours"]').value);
   }, 0);
+  const scoreScale = getScoreScale();
 
   let weightedPercent = 0;
 
@@ -130,7 +152,7 @@ function updateResults() {
     const gradeSum = selectedGoals.reduce((sum, goal) => sum + gradeValues[goal.value], 0);
     const isSubjectComplete = selectedGoals.length === goals.length;
     const subjectPercent = goals.length ? gradeSum / goals.length : 0;
-    const subjectPoints = totalHours && isSubjectComplete ? ((subjectPercent * 35) / 100) * (hours / totalHours) : 0;
+    const subjectPoints = totalHours && isSubjectComplete ? ((subjectPercent * scoreScale) / 100) * (hours / totalHours) : 0;
     const subjectWeightedPercent = totalHours && isSubjectComplete ? subjectPercent * (hours / totalHours) : 0;
 
     weightedPercent += subjectWeightedPercent;
@@ -138,16 +160,20 @@ function updateResults() {
     row.querySelector(".subject-points").value = isSubjectComplete ? subjectPoints.toFixed(2) : "--";
   });
 
-  const averageOutOf35 = (weightedPercent * 35) / 100;
+  const averageOutOfScale = (weightedPercent * scoreScale) / 100;
   const isFormComplete = rows.every((row) => !row.classList.contains("incomplete-subject"));
 
   totalHoursElement.textContent = totalHours;
-  averageScoreElement.textContent = isFormComplete ? averageOutOf35.toFixed(2) : "--";
-  totalScoreElement.textContent = isFormComplete ? `${averageOutOf35.toFixed(2)} / 35` : "غير مكتمل";
+  averageScoreElement.textContent = isFormComplete ? averageOutOfScale.toFixed(2) : "--";
+  totalScoreElement.textContent = isFormComplete ? `${averageOutOfScale.toFixed(2)} / ${scoreScale}` : "غير مكتمل";
 }
 
 countInputs.forEach((input) => {
   input.addEventListener("change", () => createSubjectRows(getSelectedGrade()));
+});
+
+scaleInputs.forEach((input) => {
+  input.addEventListener("change", updateResults);
 });
 
 if (themeToggle) {

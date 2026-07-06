@@ -7,7 +7,13 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <a class="floating-home-link" href="index.html">الصفحة الرئيسية</a>
+    <a class="floating-home-link" href="index.html" aria-label="الرجوع للصفحة الرئيسية" title="الصفحة الرئيسية">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10.8 12 3l9 7.8" />
+        <path d="M5 10v10h14V10" />
+        <path d="M9 20v-6h6v6" />
+      </svg>
+    </a>
     <main class="app-shell">
       <section class="calculator" aria-labelledby="business-title">
         <div class="header">
@@ -17,7 +23,7 @@
           </div>
           <div class="header-actions">
             <div class="total-badge">
-              <span>المجموع</span>
+              <span id="total-score-label">المجموع</span>
               <strong id="total-score">غير مكتمل</strong>
             </div>
           </div>
@@ -40,6 +46,18 @@
             </label>
           </fieldset>
 
+          <fieldset class="subject-count score-scale" id="tenth-grade-scale" hidden>
+            <legend>حساب معدل عاشر</legend>
+            <label>
+              <input type="radio" name="score-scale" value="70" checked />
+              <span>من 70%</span>
+            </label>
+            <label>
+              <input type="radio" name="score-scale" value="100" />
+              <span>من 100%</span>
+            </label>
+          </fieldset>
+
           <div id="subjects-list" class="subjects-list"></div>
           <div class="reset-row">
             <button class="reset-button" type="button" id="reset-grades">Reset</button>
@@ -52,7 +70,7 @@
             <strong id="total-hours">0</strong>
           </div>
           <div>
-            <span>المعدل من 35</span>
+            <span id="average-score-label">المعدل من 35</span>
             <strong id="average-score">--</strong>
           </div>
         </section>
