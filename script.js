@@ -54,7 +54,7 @@ function createSubjectRows(grade) {
     const row = subjectTemplate.content.firstElementChild.cloneNode(true);
     const nameInput = row.querySelector('input[name="subject-name"]');
     const hoursSelect = row.querySelector('select[name="subject-hours"]');
-    const goalsCount = grade === 12 && index === subjects.length - 1 ? 4 : 3;
+const goalsCount = grade === 12 && (index === 0 || index === subjects.length - 1) ? 4 : 3;
     const fixedSubject = subjects[index];
 
     nameInput.placeholder = `المادة ${index + 1}`;
