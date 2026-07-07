@@ -5,12 +5,6 @@ const gradeValues = {
 };
 
 const goalLabels = ["أ", "ب", "ج", "د"];
-const commonSubjectSettings = [
-  { key: "arabic", max: 100, weight: 10 },
-  { key: "english", max: 100, weight: 10 },
-  { key: "islamic", max: 60, weight: 6 },
-  { key: "jordan-history", max: 40, weight: 4 },
-];
 const firstSecondarySubjects = [
   { name: "أنظمة تكنولوجيا المعلومات", hours: 120 },
   { name: "تطوير المواقع الالكترونية", hours: 60 },
@@ -39,7 +33,6 @@ const subjectsByGrade = {
   11: firstSecondarySubjects,
   12: secondSecondarySubjects,
 };
-
 const subjectsList = document.querySelector("#subjects-list");
 const subjectTemplate = document.querySelector("#subject-template");
 const totalHoursElement = document.querySelector("#total-hours");
@@ -50,54 +43,35 @@ const totalScoreLabel = document.querySelector("#total-score-label");
 const countInputs = document.querySelectorAll('input[name="subject-count"]');
 const scaleFieldset = document.querySelector("#tenth-grade-scale");
 const scaleInputs = document.querySelectorAll('input[name="score-scale"]');
-const secondaryOptions = document.querySelector("#secondary-options");
-const includeCommonSubjectsInput = document.querySelector("#include-common-subjects");
-const commonSubjectsPanel = document.querySelector("#common-subjects");
-const commonInputs = document.querySelectorAll("[data-common-subject]");
 const themeToggle = document.querySelector("#theme-toggle");
 const resetGradesButton = document.querySelector("#reset-grades");
-const savedGoalValues = {};
 
-function getSelectedGrade() {
-  const checkedInput = document.querySelector('input[name="subject-count"]:checked');
-  return checkedInput ? checkedInput.value : "10";
-}
-
-function renderSubjectRows() {
-  saveVisibleGoalValues();
+function createSubjectRows(grade) {
   subjectsList.innerHTML = "";
+  const subjects = subjectsByGrade[grade];
 
-  getVisibleSubjectGroups().forEach((group) => {
-    if (isCombinedSecondary()) {
-      const groupTitle = document.createElement("h2");
-      groupTitle.className = "subject-group-title";
-      groupTitle.textContent = group.title;
-      subjectsList.append(groupTitle);
+  for (let index = 0; index < subjects.length; index += 1) {
+    const row = subjectTemplate.content.firstElementChild.cloneNode(true);
+    const nameInput = row.querySelector('input[name="subject-name"]');
+    const hoursSelect = row.querySelector('select[name="subject-hours"]');
+    const goalsCount = grade === 12 && index === subjects.length - 1 ? 4 : 3;
+    const fixedSubject = subjects[index];
+
+    nameInput.placeholder = `المادة ${index + 1}`;
+    nameInput.value = fixedSubject?.name || "";
+    nameInput.readOnly = Boolean(fixedSubject);
+    hoursSelect.value = fixedSubject?.hours || 60;
+    hoursSelect.disabled = Boolean(fixedSubject);
+    row.dataset.subjectNumber = index + 1;
+    row.classList.toggle("fixed-subject", Boolean(fixedSubject));
+    if (fixedSubject) {
+      showFixedSubjectText(row, fixedSubject);
     }
-
-    group.subjects.forEach((subject, index) => {
-      const row = subjectTemplate.content.firstElementChild.cloneNode(true);
-      const nameInput = row.querySelector('input[name="subject-name"]');
-      const hoursSelect = row.querySelector('select[name="subject-hours"]');
-      const goalsCount = group.grade === 12 && index === group.subjects.length - 1 ? 4 : 3;
-
-      nameInput.placeholder = `المادة ${subjectsList.children.length + 1}`;
-      nameInput.value = subject.name;
-      nameInput.readOnly = true;
-      hoursSelect.value = subject.hours;
-      hoursSelect.disabled = true;
-      row.dataset.subjectNumber = isCombinedSecondary() ? index + 1 : subjectsList.querySelectorAll(".subject-row").length + 1;
-      row.dataset.goalKey = `${group.grade}-${index}`;
-      row.classList.add("fixed-subject");
-
-      showFixedSubjectText(row, subject);
-      row.style.setProperty("--goal-count", goalsCount);
-      row.classList.toggle("extra-goals-subject", goalsCount === 4);
-      createGoalSelectors(row, goalsCount);
-      restoreGoalValues(row);
-      subjectsList.append(row);
-    });
-  });
+    row.style.setProperty("--goal-count", goalsCount);
+    row.classList.toggle("extra-goals-subject", goalsCount === 4);
+    createGoalSelectors(row, goalsCount);
+    subjectsList.append(row);
+  }
 
   updateResults();
 }
@@ -141,123 +115,33 @@ function createGoalSelectors(row, goalsCount) {
   }
 }
 
-function saveVisibleGoalValues() {
-  subjectsList.querySelectorAll(".subject-row").forEach((row) => {
-    savedGoalValues[row.dataset.goalKey] = [...row.querySelectorAll('select[name="learning-goal-grade"]')].map(
-      (select) => select.value,
-    );
-  });
-}
-
-function restoreGoalValues(row) {
-  const values = savedGoalValues[row.dataset.goalKey];
-
-  if (!values) {
-    return;
-  }
-
-  row.querySelectorAll('select[name="learning-goal-grade"]').forEach((select, index) => {
-    select.value = values[index] || "";
-  });
-}
-
-function isCombinedSecondary() {
-  return getSelectedGrade() === "secondary-combined";
-}
-
-function includesCommonSubjects() {
-  return isCombinedSecondary() && Boolean(includeCommonSubjectsInput && includeCommonSubjectsInput.checked);
-}
-
-function getVisibleSubjectGroups() {
-  if (isCombinedSecondary()) {
-    return [
-      { grade: 11, title: "مواد أول ثانوي", subjects: subjectsByGrade[11] },
-      { grade: 12, title: "مواد ثاني ثانوي", subjects: subjectsByGrade[12] },
-    ];
-  }
-
-  const selectedGrade = getSelectedGrade();
-  return [{ grade: selectedGrade, subjects: subjectsByGrade[selectedGrade] }];
+function getSelectedGrade() {
+  return Number(document.querySelector('input[name="subject-count"]:checked').value);
 }
 
 function getScoreScale() {
-  if (getSelectedGrade() === "10") {
-    return Number(document.querySelector('input[name="score-scale"]:checked')?.value || 70);
+  if (getSelectedGrade() !== 10) {
+    return 35;
   }
 
-  if (isCombinedSecondary()) {
-    return includesCommonSubjects() ? 100 : 70;
-  }
-
-  return 35;
-}
-
-function getVocationalScale() {
-  return isCombinedSecondary() ? 70 : getScoreScale();
-}
-
-function getCommonSubjectsScore() {
-  if (!includesCommonSubjects()) {
-    return { score: 0, isComplete: true };
-  }
-
-  let score = 0;
-  let isComplete = true;
-
-  commonSubjectSettings.forEach((subject) => {
-    const input = document.querySelector(`[data-common-subject="${subject.key}"]`);
-
-    if (!input) {
-      isComplete = false;
-      return;
-    }
-
-    clampCommonInput(input);
-    const value = Number(input.value);
-    const hasValidValue = input.value !== "" && value >= 0 && value <= subject.max;
-
-    input.classList.toggle("invalid-input", !hasValidValue);
-    isComplete = isComplete && hasValidValue;
-    score += hasValidValue ? (value / subject.max) * subject.weight : 0;
-  });
-
-  return { score, isComplete };
+  return Number(document.querySelector('input[name="score-scale"]:checked')?.value || 70);
 }
 
 function updateScaleControls() {
-  const selectedGrade = getSelectedGrade();
   const scoreScale = getScoreScale();
-  const commonSubjectsIncluded = includesCommonSubjects();
 
-  document.body.dataset.selectedGrade = String(selectedGrade);
-  document.body.dataset.combinedSecondary = String(isCombinedSecondary());
-  if (scaleFieldset) {
-    scaleFieldset.hidden = selectedGrade !== "10";
-  }
-  if (secondaryOptions) {
-    secondaryOptions.hidden = !isCombinedSecondary();
-  }
-  if (commonSubjectsPanel) {
-    commonSubjectsPanel.hidden = !commonSubjectsIncluded;
-  }
-  if (!commonSubjectsIncluded && commonInputs.length) {
-    commonInputs.forEach((input) => input.classList.remove("invalid-input"));
-  }
+  scaleFieldset.hidden = getSelectedGrade() !== 10;
   averageScoreLabel.textContent = `المعدل من ${scoreScale}`;
   totalScoreLabel.textContent = `المجموع من ${scoreScale}`;
 }
 
 function updateResults() {
-  saveVisibleGoalValues();
   updateScaleControls();
-
   const rows = [...subjectsList.querySelectorAll(".subject-row")];
   const totalHours = rows.reduce((sum, row) => {
     return sum + Number(row.querySelector('select[name="subject-hours"]').value);
   }, 0);
   const scoreScale = getScoreScale();
-  const vocationalScale = getVocationalScale();
 
   let weightedPercent = 0;
 
@@ -268,7 +152,7 @@ function updateResults() {
     const gradeSum = selectedGoals.reduce((sum, goal) => sum + gradeValues[goal.value], 0);
     const isSubjectComplete = selectedGoals.length === goals.length;
     const subjectPercent = goals.length ? gradeSum / goals.length : 0;
-    const subjectPoints = totalHours && isSubjectComplete ? ((subjectPercent * vocationalScale) / 100) * (hours / totalHours) : 0;
+    const subjectPoints = totalHours && isSubjectComplete ? ((subjectPercent * scoreScale) / 100) * (hours / totalHours) : 0;
     const subjectWeightedPercent = totalHours && isSubjectComplete ? subjectPercent * (hours / totalHours) : 0;
 
     weightedPercent += subjectWeightedPercent;
@@ -276,35 +160,21 @@ function updateResults() {
     row.querySelector(".subject-points").value = isSubjectComplete ? subjectPoints.toFixed(2) : "--";
   });
 
-  const commonSubjects = getCommonSubjectsScore();
-  const finalScore = (weightedPercent * vocationalScale) / 100 + commonSubjects.score;
-  const isFormComplete =
-    rows.every((row) => !row.classList.contains("incomplete-subject")) && commonSubjects.isComplete;
+  const averageOutOfScale = (weightedPercent * scoreScale) / 100;
+  const isFormComplete = rows.every((row) => !row.classList.contains("incomplete-subject"));
 
   totalHoursElement.textContent = totalHours;
-  averageScoreElement.textContent = isFormComplete ? finalScore.toFixed(2) : "--";
-  totalScoreElement.textContent = isFormComplete ? `${finalScore.toFixed(2)} / ${scoreScale}` : "غير مكتمل";
+  averageScoreElement.textContent = isFormComplete ? averageOutOfScale.toFixed(2) : "--";
+  totalScoreElement.textContent = isFormComplete ? `${averageOutOfScale.toFixed(2)} / ${scoreScale}` : "غير مكتمل";
 }
 
 countInputs.forEach((input) => {
-  input.addEventListener("change", renderSubjectRows);
+  input.addEventListener("change", () => createSubjectRows(getSelectedGrade()));
 });
 
 scaleInputs.forEach((input) => {
   input.addEventListener("change", updateResults);
 });
-
-if (includeCommonSubjectsInput) {
-  includeCommonSubjectsInput.addEventListener("change", updateResults);
-}
-if (commonInputs.length) {
-  commonInputs.forEach((input) => {
-    input.addEventListener("input", () => {
-      clampCommonInput(input);
-      updateResults();
-    });
-  });
-}
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
@@ -313,23 +183,13 @@ if (themeToggle) {
   });
 }
 
-if (resetGradesButton) {
-  resetGradesButton.addEventListener("click", () => {
-    subjectsList.querySelectorAll(".subject-row").forEach((row) => {
-      delete savedGoalValues[row.dataset.goalKey];
-    });
-    subjectsList.querySelectorAll('select[name="learning-goal-grade"]').forEach((select) => {
-      select.value = "";
-    });
-    commonInputs.forEach((input) => {
-      if (!commonSubjectsPanel || !commonSubjectsPanel.hidden) {
-        input.value = "";
-      }
-    });
-
-    updateResults();
+resetGradesButton.addEventListener("click", () => {
+  subjectsList.querySelectorAll('select[name="learning-goal-grade"]').forEach((select) => {
+    select.value = "";
   });
-}
+
+  updateResults();
+});
 
 subjectsList.addEventListener("input", updateResults);
 subjectsList.addEventListener("change", updateResults);
@@ -355,23 +215,5 @@ function setTheme(theme) {
   localStorage.setItem("grades-theme", theme);
 }
 
-function clampCommonInput(input) {
-  if (input.value === "") {
-    return;
-  }
-
-  const max = Number(input.max);
-  const min = Number(input.min || 0);
-  const value = Number(input.value);
-
-  if (Number.isNaN(value)) {
-    input.value = "";
-  } else if (value > max) {
-    input.value = max;
-  } else if (value < min) {
-    input.value = min;
-  }
-}
-
 setTheme(localStorage.getItem("grades-theme") || "dark");
-renderSubjectRows();
+createSubjectRows(getSelectedGrade());
