@@ -8,7 +8,7 @@
   </head>
   <body>
     <a class="floating-home-link" href="index.html" aria-label="الرجوع للصفحة الرئيسية" title="الصفحة الرئيسية">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M3 10.8 12 3l9 7.8" />
         <path d="M5 10v10h14V10" />
         <path d="M9 20v-6h6v6" />
@@ -44,10 +44,6 @@
               <input type="radio" name="subject-count" value="12" checked />
               <span>ثاني ثانوي</span>
             </label>
-            <label>
-              <input type="radio" name="subject-count" value="secondary-combined" />
-              <span>أول وثانوي معًا</span>
-            </label>
           </fieldset>
 
           <fieldset class="subject-count score-scale" id="tenth-grade-scale" hidden>
@@ -64,7 +60,7 @@
 
           <div id="subjects-list" class="subjects-list"></div>
           <div class="reset-row">
-            <button class="reset-button" type="button" id="reset-grades">إعادة التعيين</button>
+            <button class="reset-button" type="button" id="reset-grades">Reset</button>
           </div>
         </form>
 
